@@ -13,8 +13,8 @@ type QueueConsumerResultEnvelope struct {
 }
 
 type QueueConsumerModel struct {
-	AccountID       types.String                `tfsdk:"account_id" path:"account_id,required"`
 	QueueID         types.String                `tfsdk:"queue_id" path:"queue_id,required"`
+	AccountID       types.String                `tfsdk:"account_id" path:"account_id,optional"`
 	ConsumerID      types.String                `tfsdk:"consumer_id" path:"consumer_id,optional"`
 	Type            types.String                `tfsdk:"type" json:"type,required"`
 	DeadLetterQueue types.String                `tfsdk:"dead_letter_queue" json:"dead_letter_queue,optional"`

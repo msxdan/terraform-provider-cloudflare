@@ -64,6 +64,12 @@ func (r *ZeroTrustGatewaySettingsResource) Create(ctx context.Context, req resou
 		return
 	}
 
+	params := zero_trust.GatewayConfigurationUpdateParams{}
+
+	if !data.ID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *ZeroTrustGatewaySettingsResource) Create(ctx context.Context, req resou
 	env := ZeroTrustGatewaySettingsResultEnvelope{*data}
 	_, err = r.client.ZeroTrust.Gateway.Configurations.Update(
 		ctx,
-		zero_trust.GatewayConfigurationUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *ZeroTrustGatewaySettingsResource) Update(ctx context.Context, req resou
 		return
 	}
 
+	params := zero_trust.GatewayConfigurationUpdateParams{}
+
+	if !data.ID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *ZeroTrustGatewaySettingsResource) Update(ctx context.Context, req resou
 	env := ZeroTrustGatewaySettingsResultEnvelope{*data}
 	_, err = r.client.ZeroTrust.Gateway.Configurations.Update(
 		ctx,
-		zero_trust.GatewayConfigurationUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,13 +162,17 @@ func (r *ZeroTrustGatewaySettingsResource) Read(ctx context.Context, req resourc
 		return
 	}
 
+	params := zero_trust.GatewayConfigurationGetParams{}
+
+	if !data.ID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := ZeroTrustGatewaySettingsResultEnvelope{*data}
 	_, err := r.client.ZeroTrust.Gateway.Configurations.Get(
 		ctx,
-		zero_trust.GatewayConfigurationGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

@@ -64,6 +64,12 @@ func (r *ZeroTrustDLPPredefinedProfileResource) Create(ctx context.Context, req 
 		return
 	}
 
+	params := zero_trust.DLPProfilePredefinedUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -74,9 +80,7 @@ func (r *ZeroTrustDLPPredefinedProfileResource) Create(ctx context.Context, req 
 	_, err = r.client.ZeroTrust.DLP.Profiles.Predefined.Update(
 		ctx,
 		data.ProfileID.ValueString(),
-		zero_trust.DLPProfilePredefinedUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -114,6 +118,12 @@ func (r *ZeroTrustDLPPredefinedProfileResource) Update(ctx context.Context, req 
 		return
 	}
 
+	params := zero_trust.DLPProfilePredefinedUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -124,9 +134,7 @@ func (r *ZeroTrustDLPPredefinedProfileResource) Update(ctx context.Context, req 
 	_, err = r.client.ZeroTrust.DLP.Profiles.Predefined.Update(
 		ctx,
 		data.ProfileID.ValueString(),
-		zero_trust.DLPProfilePredefinedUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -156,14 +164,18 @@ func (r *ZeroTrustDLPPredefinedProfileResource) Read(ctx context.Context, req re
 		return
 	}
 
+	params := zero_trust.DLPProfilePredefinedGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := ZeroTrustDLPPredefinedProfileResultEnvelope{*data}
 	_, err := r.client.ZeroTrust.DLP.Profiles.Predefined.Get(
 		ctx,
 		data.ProfileID.ValueString(),
-		zero_trust.DLPProfilePredefinedGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -197,12 +209,16 @@ func (r *ZeroTrustDLPPredefinedProfileResource) Delete(ctx context.Context, req 
 		return
 	}
 
+	params := zero_trust.DLPProfilePredefinedDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.ZeroTrust.DLP.Profiles.Predefined.Delete(
 		ctx,
 		data.ProfileID.ValueString(),
-		zero_trust.DLPProfilePredefinedDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

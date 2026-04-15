@@ -64,6 +64,12 @@ func (r *HyperdriveConfigResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
+	params := hyperdrive.ConfigNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *HyperdriveConfigResource) Create(ctx context.Context, req resource.Crea
 	env := HyperdriveConfigResultEnvelope{*data}
 	_, err = r.client.Hyperdrive.Configs.New(
 		ctx,
-		hyperdrive.ConfigNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *HyperdriveConfigResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
+	params := hyperdrive.ConfigUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *HyperdriveConfigResource) Update(ctx context.Context, req resource.Upda
 	_, err = r.client.Hyperdrive.Configs.Update(
 		ctx,
 		data.ID.ValueString(),
-		hyperdrive.ConfigUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *HyperdriveConfigResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
+	params := hyperdrive.ConfigGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := HyperdriveConfigResultEnvelope{*data}
 	_, err := r.client.Hyperdrive.Configs.Get(
 		ctx,
 		data.ID.ValueString(),
-		hyperdrive.ConfigGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *HyperdriveConfigResource) Delete(ctx context.Context, req resource.Dele
 		return
 	}
 
+	params := hyperdrive.ConfigDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.Hyperdrive.Configs.Delete(
 		ctx,
 		data.ID.ValueString(),
-		hyperdrive.ConfigDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

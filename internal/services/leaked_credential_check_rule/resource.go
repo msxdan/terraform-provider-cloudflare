@@ -64,6 +64,12 @@ func (r *LeakedCredentialCheckRuleResource) Create(ctx context.Context, req reso
 		return
 	}
 
+	params := leaked_credential_checks.DetectionNewParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *LeakedCredentialCheckRuleResource) Create(ctx context.Context, req reso
 	env := LeakedCredentialCheckRuleResultEnvelope{*data}
 	_, err = r.client.LeakedCredentialChecks.Detections.New(
 		ctx,
-		leaked_credential_checks.DetectionNewParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *LeakedCredentialCheckRuleResource) Update(ctx context.Context, req reso
 		return
 	}
 
+	params := leaked_credential_checks.DetectionUpdateParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *LeakedCredentialCheckRuleResource) Update(ctx context.Context, req reso
 	_, err = r.client.LeakedCredentialChecks.Detections.Update(
 		ctx,
 		data.ID.ValueString(),
-		leaked_credential_checks.DetectionUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *LeakedCredentialCheckRuleResource) Read(ctx context.Context, req resour
 		return
 	}
 
+	params := leaked_credential_checks.DetectionGetParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := LeakedCredentialCheckRuleResultEnvelope{*data}
 	_, err := r.client.LeakedCredentialChecks.Detections.Get(
 		ctx,
 		data.ID.ValueString(),
-		leaked_credential_checks.DetectionGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *LeakedCredentialCheckRuleResource) Delete(ctx context.Context, req reso
 		return
 	}
 
+	params := leaked_credential_checks.DetectionDeleteParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	_, err := r.client.LeakedCredentialChecks.Detections.Delete(
 		ctx,
 		data.ID.ValueString(),
-		leaked_credential_checks.DetectionDeleteParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

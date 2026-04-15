@@ -18,9 +18,9 @@ type QueueConsumerResultDataSourceEnvelope struct {
 }
 
 type QueueConsumerDataSourceModel struct {
-	AccountID       types.String                                                   `tfsdk:"account_id" path:"account_id,required"`
 	ConsumerID      types.String                                                   `tfsdk:"consumer_id" path:"consumer_id,required"`
 	QueueID         types.String                                                   `tfsdk:"queue_id" path:"queue_id,required"`
+	AccountID       types.String                                                   `tfsdk:"account_id" path:"account_id,optional"`
 	CreatedOn       timetypes.RFC3339                                              `tfsdk:"created_on" json:"created_on,computed" format:"date-time"`
 	DeadLetterQueue types.String                                                   `tfsdk:"dead_letter_queue" json:"dead_letter_queue,computed"`
 	QueueName       types.String                                                   `tfsdk:"queue_name" json:"queue_name,computed"`
@@ -30,8 +30,10 @@ type QueueConsumerDataSourceModel struct {
 }
 
 func (m *QueueConsumerDataSourceModel) toReadParams(_ context.Context) (params queues.ConsumerGetParams, diags diag.Diagnostics) {
-	params = queues.ConsumerGetParams{
-		AccountID: cloudflare.F(m.AccountID.ValueString()),
+	params = queues.ConsumerGetParams{}
+
+	if !m.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(m.AccountID.ValueString())
 	}
 
 	return

@@ -64,6 +64,12 @@ func (r *LoadBalancerResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
+	params := load_balancers.LoadBalancerNewParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, req resource.CreateRe
 	env := LoadBalancerResultEnvelope{*data}
 	_, err = r.client.LoadBalancers.New(
 		ctx,
-		load_balancers.LoadBalancerNewParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *LoadBalancerResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	params := load_balancers.LoadBalancerUpdateParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, req resource.UpdateRe
 	_, err = r.client.LoadBalancers.Update(
 		ctx,
 		data.ID.ValueString(),
-		load_balancers.LoadBalancerUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *LoadBalancerResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
+	params := load_balancers.LoadBalancerGetParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := LoadBalancerResultEnvelope{*data}
 	_, err := r.client.LoadBalancers.Get(
 		ctx,
 		data.ID.ValueString(),
-		load_balancers.LoadBalancerGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
+	params := load_balancers.LoadBalancerDeleteParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	_, err := r.client.LoadBalancers.Delete(
 		ctx,
 		data.ID.ValueString(),
-		load_balancers.LoadBalancerDeleteParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

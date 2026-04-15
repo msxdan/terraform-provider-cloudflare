@@ -61,6 +61,12 @@ func (r *R2CustomDomainResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
+	params := r2.BucketDomainCustomNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -71,9 +77,7 @@ func (r *R2CustomDomainResource) Create(ctx context.Context, req resource.Create
 	_, err = r.client.R2.Buckets.Domains.Custom.New(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketDomainCustomNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -110,6 +114,12 @@ func (r *R2CustomDomainResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
+	params := r2.BucketDomainCustomUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -121,9 +131,7 @@ func (r *R2CustomDomainResource) Update(ctx context.Context, req resource.Update
 		ctx,
 		data.BucketName.ValueString(),
 		data.Domain.ValueString(),
-		r2.BucketDomainCustomUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -152,15 +160,19 @@ func (r *R2CustomDomainResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
+	params := r2.BucketDomainCustomGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := R2CustomDomainResultEnvelope{*data}
 	_, err := r.client.R2.Buckets.Domains.Custom.Get(
 		ctx,
 		data.BucketName.ValueString(),
 		data.Domain.ValueString(),
-		r2.BucketDomainCustomGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,13 +205,17 @@ func (r *R2CustomDomainResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
+	params := r2.BucketDomainCustomDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.R2.Buckets.Domains.Custom.Delete(
 		ctx,
 		data.BucketName.ValueString(),
 		data.Domain.ValueString(),
-		r2.BucketDomainCustomDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

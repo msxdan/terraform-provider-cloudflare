@@ -61,6 +61,12 @@ func (r *R2BucketEventNotificationResource) Create(ctx context.Context, req reso
 		return
 	}
 
+	params := r2.BucketEventNotificationUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -72,9 +78,7 @@ func (r *R2BucketEventNotificationResource) Create(ctx context.Context, req reso
 		ctx,
 		data.BucketName.ValueString(),
 		data.QueueID.ValueString(),
-		r2.BucketEventNotificationUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -111,6 +115,12 @@ func (r *R2BucketEventNotificationResource) Update(ctx context.Context, req reso
 		return
 	}
 
+	params := r2.BucketEventNotificationUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *R2BucketEventNotificationResource) Update(ctx context.Context, req reso
 		ctx,
 		data.BucketName.ValueString(),
 		data.QueueID.ValueString(),
-		r2.BucketEventNotificationUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,15 +161,19 @@ func (r *R2BucketEventNotificationResource) Read(ctx context.Context, req resour
 		return
 	}
 
+	params := r2.BucketEventNotificationGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := R2BucketEventNotificationResultEnvelope{*data}
 	_, err := r.client.R2.Buckets.EventNotifications.Get(
 		ctx,
 		data.BucketName.ValueString(),
 		data.QueueID.ValueString(),
-		r2.BucketEventNotificationGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -194,13 +206,17 @@ func (r *R2BucketEventNotificationResource) Delete(ctx context.Context, req reso
 		return
 	}
 
+	params := r2.BucketEventNotificationDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.R2.Buckets.EventNotifications.Delete(
 		ctx,
 		data.BucketName.ValueString(),
 		data.QueueID.ValueString(),
-		r2.BucketEventNotificationDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

@@ -64,6 +64,12 @@ func (r *TieredCacheResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
+	params := cache.SmartTieredCacheEditParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *TieredCacheResource) Create(ctx context.Context, req resource.CreateReq
 	env := TieredCacheResultEnvelope{*data}
 	_, err = r.client.Cache.SmartTieredCache.Edit(
 		ctx,
-		cache.SmartTieredCacheEditParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *TieredCacheResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
+	params := cache.SmartTieredCacheEditParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *TieredCacheResource) Update(ctx context.Context, req resource.UpdateReq
 	env := TieredCacheResultEnvelope{*data}
 	_, err = r.client.Cache.SmartTieredCache.Edit(
 		ctx,
-		cache.SmartTieredCacheEditParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,13 +162,17 @@ func (r *TieredCacheResource) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
+	params := cache.SmartTieredCacheGetParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := TieredCacheResultEnvelope{*data}
 	_, err := r.client.Cache.SmartTieredCache.Get(
 		ctx,
-		cache.SmartTieredCacheGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -194,11 +206,15 @@ func (r *TieredCacheResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
+	params := cache.SmartTieredCacheDeleteParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	_, err := r.client.Cache.SmartTieredCache.Delete(
 		ctx,
-		cache.SmartTieredCacheDeleteParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

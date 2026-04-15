@@ -64,6 +64,12 @@ func (r *MagicTransitConnectorResource) Create(ctx context.Context, req resource
 		return
 	}
 
+	params := magic_transit.ConnectorNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *MagicTransitConnectorResource) Create(ctx context.Context, req resource
 	env := MagicTransitConnectorResultEnvelope{*data}
 	_, err = r.client.MagicTransit.Connectors.New(
 		ctx,
-		magic_transit.ConnectorNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *MagicTransitConnectorResource) Update(ctx context.Context, req resource
 		return
 	}
 
+	params := magic_transit.ConnectorEditParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *MagicTransitConnectorResource) Update(ctx context.Context, req resource
 	_, err = r.client.MagicTransit.Connectors.Edit(
 		ctx,
 		data.ID.ValueString(),
-		magic_transit.ConnectorEditParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *MagicTransitConnectorResource) Read(ctx context.Context, req resource.R
 		return
 	}
 
+	params := magic_transit.ConnectorGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := MagicTransitConnectorResultEnvelope{*data}
 	_, err := r.client.MagicTransit.Connectors.Get(
 		ctx,
 		data.ID.ValueString(),
-		magic_transit.ConnectorGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *MagicTransitConnectorResource) Delete(ctx context.Context, req resource
 		return
 	}
 
+	params := magic_transit.ConnectorDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.MagicTransit.Connectors.Delete(
 		ctx,
 		data.ID.ValueString(),
-		magic_transit.ConnectorDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

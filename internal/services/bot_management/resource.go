@@ -64,6 +64,12 @@ func (r *BotManagementResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
+	params := bot_management.BotManagementUpdateParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *BotManagementResource) Create(ctx context.Context, req resource.CreateR
 	env := BotManagementResultEnvelope{*data}
 	_, err = r.client.BotManagement.Update(
 		ctx,
-		bot_management.BotManagementUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *BotManagementResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
+	params := bot_management.BotManagementUpdateParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *BotManagementResource) Update(ctx context.Context, req resource.UpdateR
 	env := BotManagementResultEnvelope{*data}
 	_, err = r.client.BotManagement.Update(
 		ctx,
-		bot_management.BotManagementUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,13 +162,17 @@ func (r *BotManagementResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
+	params := bot_management.BotManagementGetParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := BotManagementResultEnvelope{*data}
 	_, err := r.client.BotManagement.Get(
 		ctx,
-		bot_management.BotManagementGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

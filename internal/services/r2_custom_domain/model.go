@@ -13,8 +13,8 @@ type R2CustomDomainResultEnvelope struct {
 }
 
 type R2CustomDomainModel struct {
-	AccountID  types.String                                        `tfsdk:"account_id" path:"account_id,required"`
 	BucketName types.String                                        `tfsdk:"bucket_name" path:"bucket_name,required"`
+	AccountID  types.String                                        `tfsdk:"account_id" path:"account_id,optional"`
 	Domain     types.String                                        `tfsdk:"domain" json:"domain,required"`
 	ZoneID     types.String                                        `tfsdk:"zone_id" json:"zoneId,required"`
 	Enabled    types.Bool                                          `tfsdk:"enabled" json:"enabled,required"`

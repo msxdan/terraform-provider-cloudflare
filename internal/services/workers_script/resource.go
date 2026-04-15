@@ -64,6 +64,12 @@ func (r *WorkersScriptResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
+	params := workers.ScriptUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, contentType, err := data.MarshalMultipart()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize multipart http request", err.Error())
@@ -74,9 +80,7 @@ func (r *WorkersScriptResource) Create(ctx context.Context, req resource.CreateR
 	_, err = r.client.Workers.Scripts.Update(
 		ctx,
 		data.ScriptName.ValueString(),
-		workers.ScriptUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody(contentType, dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -114,6 +118,12 @@ func (r *WorkersScriptResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
+	params := workers.ScriptUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, contentType, err := data.MarshalMultipart()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize multipart http request", err.Error())
@@ -124,9 +134,7 @@ func (r *WorkersScriptResource) Update(ctx context.Context, req resource.UpdateR
 	_, err = r.client.Workers.Scripts.Update(
 		ctx,
 		data.ScriptName.ValueString(),
-		workers.ScriptUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody(contentType, dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -156,13 +164,17 @@ func (r *WorkersScriptResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
+	params := workers.ScriptGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	_, err := r.client.Workers.Scripts.Get(
 		ctx,
 		data.ScriptName.ValueString(),
-		workers.ScriptGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -189,12 +201,16 @@ func (r *WorkersScriptResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
+	params := workers.ScriptDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.Workers.Scripts.Delete(
 		ctx,
 		data.ScriptName.ValueString(),
-		workers.ScriptDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

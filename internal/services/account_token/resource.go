@@ -64,6 +64,12 @@ func (r *AccountTokenResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
+	params := accounts.TokenNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *AccountTokenResource) Create(ctx context.Context, req resource.CreateRe
 	env := AccountTokenResultEnvelope{*data}
 	_, err = r.client.Accounts.Tokens.New(
 		ctx,
-		accounts.TokenNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *AccountTokenResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	params := accounts.TokenUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *AccountTokenResource) Update(ctx context.Context, req resource.UpdateRe
 	_, err = r.client.Accounts.Tokens.Update(
 		ctx,
 		data.ID.ValueString(),
-		accounts.TokenUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *AccountTokenResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
+	params := accounts.TokenGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := AccountTokenResultEnvelope{*data}
 	_, err := r.client.Accounts.Tokens.Get(
 		ctx,
 		data.ID.ValueString(),
-		accounts.TokenGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *AccountTokenResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
+	params := accounts.TokenDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.Accounts.Tokens.Delete(
 		ctx,
 		data.ID.ValueString(),
-		accounts.TokenDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

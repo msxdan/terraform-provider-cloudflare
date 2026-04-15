@@ -30,7 +30,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"zone_id": schema.StringAttribute{
 				Description: "Identifier.",
-				Required:    true,
+				Optional:    true,
 			},
 			"cloud_connector_rules_provider": schema.StringAttribute{
 				Description: "Cloud Provider type\nAvailable values: \"aws_s3\", \"cloudflare_r2\", \"gcp_storage\", \"azure_storage\".",

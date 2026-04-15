@@ -64,6 +64,12 @@ func (r *CertificateAuthoritiesHostnameAssociationsResource) Create(ctx context.
 		return
 	}
 
+	params := certificate_authorities.HostnameAssociationUpdateParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *CertificateAuthoritiesHostnameAssociationsResource) Create(ctx context.
 	env := CertificateAuthoritiesHostnameAssociationsResultEnvelope{*data}
 	_, err = r.client.CertificateAuthorities.HostnameAssociations.Update(
 		ctx,
-		certificate_authorities.HostnameAssociationUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *CertificateAuthoritiesHostnameAssociationsResource) Update(ctx context.
 		return
 	}
 
+	params := certificate_authorities.HostnameAssociationUpdateParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *CertificateAuthoritiesHostnameAssociationsResource) Update(ctx context.
 	env := CertificateAuthoritiesHostnameAssociationsResultEnvelope{*data}
 	_, err = r.client.CertificateAuthorities.HostnameAssociations.Update(
 		ctx,
-		certificate_authorities.HostnameAssociationUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,13 +162,17 @@ func (r *CertificateAuthoritiesHostnameAssociationsResource) Read(ctx context.Co
 		return
 	}
 
+	params := certificate_authorities.HostnameAssociationGetParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := CertificateAuthoritiesHostnameAssociationsResultEnvelope{*data}
 	_, err := r.client.CertificateAuthorities.HostnameAssociations.Get(
 		ctx,
-		certificate_authorities.HostnameAssociationGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

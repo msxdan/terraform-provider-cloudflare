@@ -61,6 +61,16 @@ func (r *ZeroTrustAccessMTLSHostnameSettingsResource) Create(ctx context.Context
 		return
 	}
 
+	params := zero_trust.AccessCertificateSettingUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -68,14 +78,6 @@ func (r *ZeroTrustAccessMTLSHostnameSettingsResource) Create(ctx context.Context
 	}
 	res := new(http.Response)
 	env := ZeroTrustAccessMTLSHostnameSettingsResultEnvelope{*data}
-	params := zero_trust.AccessCertificateSettingUpdateParams{}
-
-	if !data.AccountID.IsNull() {
-		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
-		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
-	}
-
 	_, err = r.client.ZeroTrust.Access.Certificates.Settings.Update(
 		ctx,
 		params,
@@ -115,6 +117,16 @@ func (r *ZeroTrustAccessMTLSHostnameSettingsResource) Update(ctx context.Context
 		return
 	}
 
+	params := zero_trust.AccessCertificateSettingUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,14 +134,6 @@ func (r *ZeroTrustAccessMTLSHostnameSettingsResource) Update(ctx context.Context
 	}
 	res := new(http.Response)
 	env := ZeroTrustAccessMTLSHostnameSettingsResultEnvelope{*data}
-	params := zero_trust.AccessCertificateSettingUpdateParams{}
-
-	if !data.AccountID.IsNull() {
-		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
-		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
-	}
-
 	_, err = r.client.ZeroTrust.Access.Certificates.Settings.Update(
 		ctx,
 		params,
@@ -161,16 +165,18 @@ func (r *ZeroTrustAccessMTLSHostnameSettingsResource) Read(ctx context.Context, 
 		return
 	}
 
-	res := new(http.Response)
-	env := ZeroTrustAccessMTLSHostnameSettingsResultEnvelope{*data}
 	params := zero_trust.AccessCertificateSettingGetParams{}
 
 	if !data.AccountID.IsNull() {
 		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
+	}
+
+	if !data.ZoneID.IsNull() {
 		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
 	}
 
+	res := new(http.Response)
+	env := ZeroTrustAccessMTLSHostnameSettingsResultEnvelope{*data}
 	_, err := r.client.ZeroTrust.Access.Certificates.Settings.Get(
 		ctx,
 		params,

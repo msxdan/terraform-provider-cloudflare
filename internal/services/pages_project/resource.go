@@ -64,6 +64,12 @@ func (r *PagesProjectResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
+	params := pages.ProjectNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *PagesProjectResource) Create(ctx context.Context, req resource.CreateRe
 	env := PagesProjectResultEnvelope{*data}
 	_, err = r.client.Pages.Projects.New(
 		ctx,
-		pages.ProjectNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *PagesProjectResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	params := pages.ProjectEditParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -123,9 +133,7 @@ func (r *PagesProjectResource) Update(ctx context.Context, req resource.UpdateRe
 	_, err = r.client.Pages.Projects.Edit(
 		ctx,
 		data.Name.ValueString(),
-		pages.ProjectEditParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -155,14 +163,18 @@ func (r *PagesProjectResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
+	params := pages.ProjectGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := PagesProjectResultEnvelope{*data}
 	_, err := r.client.Pages.Projects.Get(
 		ctx,
 		data.Name.ValueString(),
-		pages.ProjectGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -196,12 +208,16 @@ func (r *PagesProjectResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
+	params := pages.ProjectDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.Pages.Projects.Delete(
 		ctx,
 		data.Name.ValueString(),
-		pages.ProjectDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

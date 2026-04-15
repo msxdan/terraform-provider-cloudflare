@@ -61,6 +61,12 @@ func (r *R2BucketSippyResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
+	params := r2.BucketSippyUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -71,9 +77,7 @@ func (r *R2BucketSippyResource) Create(ctx context.Context, req resource.CreateR
 	_, err = r.client.R2.Buckets.Sippy.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketSippyUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -110,6 +114,12 @@ func (r *R2BucketSippyResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
+	params := r2.BucketSippyUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -120,9 +130,7 @@ func (r *R2BucketSippyResource) Update(ctx context.Context, req resource.UpdateR
 	_, err = r.client.R2.Buckets.Sippy.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketSippyUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -151,14 +159,18 @@ func (r *R2BucketSippyResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
+	params := r2.BucketSippyGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := R2BucketSippyResultEnvelope{*data}
 	_, err := r.client.R2.Buckets.Sippy.Get(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketSippyGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -191,12 +203,16 @@ func (r *R2BucketSippyResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
+	params := r2.BucketSippyDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.R2.Buckets.Sippy.Delete(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketSippyDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

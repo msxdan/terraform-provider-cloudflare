@@ -64,6 +64,12 @@ func (r *ZeroTrustDeviceDefaultProfileResource) Create(ctx context.Context, req 
 		return
 	}
 
+	params := zero_trust.DevicePolicyDefaultEditParams{}
+
+	if !data.ID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *ZeroTrustDeviceDefaultProfileResource) Create(ctx context.Context, req 
 	env := ZeroTrustDeviceDefaultProfileResultEnvelope{*data}
 	_, err = r.client.ZeroTrust.Devices.Policies.Default.Edit(
 		ctx,
-		zero_trust.DevicePolicyDefaultEditParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *ZeroTrustDeviceDefaultProfileResource) Update(ctx context.Context, req 
 		return
 	}
 
+	params := zero_trust.DevicePolicyDefaultEditParams{}
+
+	if !data.ID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *ZeroTrustDeviceDefaultProfileResource) Update(ctx context.Context, req 
 	env := ZeroTrustDeviceDefaultProfileResultEnvelope{*data}
 	_, err = r.client.ZeroTrust.Devices.Policies.Default.Edit(
 		ctx,
-		zero_trust.DevicePolicyDefaultEditParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,13 +162,17 @@ func (r *ZeroTrustDeviceDefaultProfileResource) Read(ctx context.Context, req re
 		return
 	}
 
+	params := zero_trust.DevicePolicyDefaultGetParams{}
+
+	if !data.ID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := ZeroTrustDeviceDefaultProfileResultEnvelope{*data}
 	_, err := r.client.ZeroTrust.Devices.Policies.Default.Get(
 		ctx,
-		zero_trust.DevicePolicyDefaultGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

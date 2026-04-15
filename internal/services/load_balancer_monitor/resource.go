@@ -64,6 +64,12 @@ func (r *LoadBalancerMonitorResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
+	params := load_balancers.MonitorNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *LoadBalancerMonitorResource) Create(ctx context.Context, req resource.C
 	env := LoadBalancerMonitorResultEnvelope{*data}
 	_, err = r.client.LoadBalancers.Monitors.New(
 		ctx,
-		load_balancers.MonitorNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *LoadBalancerMonitorResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
+	params := load_balancers.MonitorUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *LoadBalancerMonitorResource) Update(ctx context.Context, req resource.U
 	_, err = r.client.LoadBalancers.Monitors.Update(
 		ctx,
 		data.ID.ValueString(),
-		load_balancers.MonitorUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *LoadBalancerMonitorResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
+	params := load_balancers.MonitorGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := LoadBalancerMonitorResultEnvelope{*data}
 	_, err := r.client.LoadBalancers.Monitors.Get(
 		ctx,
 		data.ID.ValueString(),
-		load_balancers.MonitorGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *LoadBalancerMonitorResource) Delete(ctx context.Context, req resource.D
 		return
 	}
 
+	params := load_balancers.MonitorDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.LoadBalancers.Monitors.Delete(
 		ctx,
 		data.ID.ValueString(),
-		load_balancers.MonitorDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

@@ -15,7 +15,7 @@ type AISearchInstanceResultEnvelope struct {
 
 type AISearchInstanceModel struct {
 	ID                             types.String                                                        `tfsdk:"id" json:"id,required"`
-	AccountID                      types.String                                                        `tfsdk:"account_id" path:"account_id,required"`
+	AccountID                      types.String                                                        `tfsdk:"account_id" path:"account_id,optional"`
 	Source                         types.String                                                        `tfsdk:"source" json:"source,optional"`
 	Type                           types.String                                                        `tfsdk:"type" json:"type,optional"`
 	HybridSearchEnabled            types.Bool                                                          `tfsdk:"hybrid_search_enabled" json:"hybrid_search_enabled,computed_optional"`

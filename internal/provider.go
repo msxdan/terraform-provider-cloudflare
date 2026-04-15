@@ -271,6 +271,8 @@ type CloudflareProviderModel struct {
 	APIKey         types.String `tfsdk:"api_key" json:"api_key,optional"`
 	APIEmail       types.String `tfsdk:"api_email" json:"api_email,optional"`
 	UserServiceKey types.String `tfsdk:"user_service_key" json:"user_service_key,optional"`
+	AccountID      types.String `tfsdk:"account_id" json:"account_id,optional"`
+	ZoneID         types.String `tfsdk:"zone_id" json:"zone_id,optional"`
 }
 
 func (p *CloudflareProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -295,6 +297,12 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 			},
 			"user_service_key": schema.StringAttribute{
+				Optional: true,
+			},
+			"account_id": schema.StringAttribute{
+				Optional: true,
+			},
+			"zone_id": schema.StringAttribute{
 				Optional: true,
 			},
 		},
@@ -341,6 +349,18 @@ func (p *CloudflareProvider) Configure(ctx context.Context, req provider.Configu
 		opts = append(opts, option.WithUserServiceKey(data.UserServiceKey.ValueString()))
 	} else if o, ok := os.LookupEnv("CLOUDFLARE_API_USER_SERVICE_KEY"); ok {
 		opts = append(opts, option.WithUserServiceKey(o))
+	}
+
+	if !data.AccountID.IsNull() && !data.AccountID.IsUnknown() {
+		opts = append(opts, option.WithAccountID(data.AccountID.ValueString()))
+	} else if o, ok := os.LookupEnv("CLOUDFLARE_ACCOUNT_ID"); ok {
+		opts = append(opts, option.WithAccountID(o))
+	}
+
+	if !data.ZoneID.IsNull() && !data.ZoneID.IsUnknown() {
+		opts = append(opts, option.WithZoneID(data.ZoneID.ValueString()))
+	} else if o, ok := os.LookupEnv("CLOUDFLARE_ZONE_ID"); ok {
+		opts = append(opts, option.WithZoneID(o))
 	}
 
 	client := cloudflare.NewClient(

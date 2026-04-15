@@ -64,6 +64,12 @@ func (r *WorkerVersionResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
+	params := workers.BetaWorkerVersionNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -74,9 +80,7 @@ func (r *WorkerVersionResource) Create(ctx context.Context, req resource.CreateR
 	_, err = r.client.Workers.Beta.Workers.Versions.New(
 		ctx,
 		data.WorkerID.ValueString(),
-		workers.BetaWorkerVersionNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -109,15 +113,19 @@ func (r *WorkerVersionResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
+	params := workers.BetaWorkerVersionGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := WorkerVersionResultEnvelope{*data}
 	_, err := r.client.Workers.Beta.Workers.Versions.Get(
 		ctx,
 		data.WorkerID.ValueString(),
 		data.ID.ValueString(),
-		workers.BetaWorkerVersionGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

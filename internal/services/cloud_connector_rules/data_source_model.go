@@ -18,7 +18,7 @@ type CloudConnectorRulesResultDataSourceEnvelope struct {
 
 type CloudConnectorRulesDataSourceModel struct {
 	ID                          types.String                                                           `tfsdk:"id" path:"zone_id,computed"`
-	ZoneID                      types.String                                                           `tfsdk:"zone_id" path:"zone_id,required"`
+	ZoneID                      types.String                                                           `tfsdk:"zone_id" path:"zone_id,optional"`
 	CloudConnectorRulesProvider types.String                                                           `tfsdk:"cloud_connector_rules_provider" json:"provider,computed"`
 	Description                 types.String                                                           `tfsdk:"description" json:"description,computed"`
 	Enabled                     types.Bool                                                             `tfsdk:"enabled" json:"enabled,computed"`
@@ -27,8 +27,10 @@ type CloudConnectorRulesDataSourceModel struct {
 }
 
 func (m *CloudConnectorRulesDataSourceModel) toReadParams(_ context.Context) (params cloud_connector.RuleListParams, diags diag.Diagnostics) {
-	params = cloud_connector.RuleListParams{
-		ZoneID: cloudflare.F(m.ZoneID.ValueString()),
+	params = cloud_connector.RuleListParams{}
+
+	if !m.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(m.ZoneID.ValueString())
 	}
 
 	return

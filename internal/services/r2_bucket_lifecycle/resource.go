@@ -61,6 +61,12 @@ func (r *R2BucketLifecycleResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
+	params := r2.BucketLifecycleUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -71,9 +77,7 @@ func (r *R2BucketLifecycleResource) Create(ctx context.Context, req resource.Cre
 	_, err = r.client.R2.Buckets.Lifecycle.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketLifecycleUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -110,6 +114,12 @@ func (r *R2BucketLifecycleResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
+	params := r2.BucketLifecycleUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -120,9 +130,7 @@ func (r *R2BucketLifecycleResource) Update(ctx context.Context, req resource.Upd
 	_, err = r.client.R2.Buckets.Lifecycle.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketLifecycleUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -151,14 +159,18 @@ func (r *R2BucketLifecycleResource) Read(ctx context.Context, req resource.ReadR
 		return
 	}
 
+	params := r2.BucketLifecycleGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := R2BucketLifecycleResultEnvelope{*data}
 	_, err := r.client.R2.Buckets.Lifecycle.Get(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketLifecycleGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

@@ -61,6 +61,12 @@ func (r *SnippetResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
+	params := snippets.SnippetUpdateParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, contentType, err := data.MarshalMultipart()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize multipart http request", err.Error())
@@ -71,9 +77,7 @@ func (r *SnippetResource) Create(ctx context.Context, req resource.CreateRequest
 	_, err = r.client.Snippets.Update(
 		ctx,
 		data.SnippetName.ValueString(),
-		snippets.SnippetUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody(contentType, dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -110,6 +114,12 @@ func (r *SnippetResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
+	params := snippets.SnippetUpdateParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, contentType, err := data.MarshalMultipart()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize multipart http request", err.Error())
@@ -120,9 +130,7 @@ func (r *SnippetResource) Update(ctx context.Context, req resource.UpdateRequest
 	_, err = r.client.Snippets.Update(
 		ctx,
 		data.SnippetName.ValueString(),
-		snippets.SnippetUpdateParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody(contentType, dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -151,14 +159,18 @@ func (r *SnippetResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
+	params := snippets.SnippetGetParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := SnippetResultEnvelope{*data}
 	_, err := r.client.Snippets.Get(
 		ctx,
 		data.SnippetName.ValueString(),
-		snippets.SnippetGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -191,12 +203,16 @@ func (r *SnippetResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
+	params := snippets.SnippetDeleteParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	_, err := r.client.Snippets.Delete(
 		ctx,
 		data.SnippetName.ValueString(),
-		snippets.SnippetDeleteParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

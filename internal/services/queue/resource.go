@@ -64,6 +64,12 @@ func (r *QueueResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
+	params := queues.QueueNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *QueueResource) Create(ctx context.Context, req resource.CreateRequest, 
 	env := QueueResultEnvelope{*data}
 	_, err = r.client.Queues.New(
 		ctx,
-		queues.QueueNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *QueueResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
+	params := queues.QueueUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -123,9 +133,7 @@ func (r *QueueResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	_, err = r.client.Queues.Update(
 		ctx,
 		data.QueueID.ValueString(),
-		queues.QueueUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -155,14 +163,18 @@ func (r *QueueResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
+	params := queues.QueueGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := QueueResultEnvelope{*data}
 	_, err := r.client.Queues.Get(
 		ctx,
 		data.QueueID.ValueString(),
-		queues.QueueGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -196,12 +208,16 @@ func (r *QueueResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		return
 	}
 
+	params := queues.QueueDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.Queues.Delete(
 		ctx,
 		data.QueueID.ValueString(),
-		queues.QueueDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

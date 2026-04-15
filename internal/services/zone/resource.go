@@ -119,9 +119,7 @@ func (r *ZoneResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	env := ZoneResultEnvelope{*data}
 	_, err = r.client.Zones.Edit(
 		ctx,
-		zones.ZoneEditParams{
-			ZoneID: cloudflare.F(data.ID.ValueString()),
-		},
+		zones.ZoneEditParams{},
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,9 +152,7 @@ func (r *ZoneResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	env := ZoneResultEnvelope{*data}
 	_, err := r.client.Zones.Get(
 		ctx,
-		zones.ZoneGetParams{
-			ZoneID: cloudflare.F(data.ID.ValueString()),
-		},
+		zones.ZoneGetParams{},
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -191,9 +187,7 @@ func (r *ZoneResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 	_, err := r.client.Zones.Delete(
 		ctx,
-		zones.ZoneDeleteParams{
-			ZoneID: cloudflare.F(data.ID.ValueString()),
-		},
+		zones.ZoneDeleteParams{},
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

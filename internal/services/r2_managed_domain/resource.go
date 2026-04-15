@@ -61,6 +61,12 @@ func (r *R2ManagedDomainResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
+	params := r2.BucketDomainManagedUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -71,9 +77,7 @@ func (r *R2ManagedDomainResource) Create(ctx context.Context, req resource.Creat
 	_, err = r.client.R2.Buckets.Domains.Managed.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketDomainManagedUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -110,6 +114,12 @@ func (r *R2ManagedDomainResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
+	params := r2.BucketDomainManagedUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -120,9 +130,7 @@ func (r *R2ManagedDomainResource) Update(ctx context.Context, req resource.Updat
 	_, err = r.client.R2.Buckets.Domains.Managed.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketDomainManagedUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),

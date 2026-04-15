@@ -64,6 +64,12 @@ func (r *ZoneDNSSECResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
+	params := dns.DNSSECEditParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *ZoneDNSSECResource) Create(ctx context.Context, req resource.CreateRequ
 	env := ZoneDNSSECResultEnvelope{*data}
 	_, err = r.client.DNS.DNSSEC.Edit(
 		ctx,
-		dns.DNSSECEditParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *ZoneDNSSECResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
+	params := dns.DNSSECEditParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *ZoneDNSSECResource) Update(ctx context.Context, req resource.UpdateRequ
 	env := ZoneDNSSECResultEnvelope{*data}
 	_, err = r.client.DNS.DNSSEC.Edit(
 		ctx,
-		dns.DNSSECEditParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -154,13 +162,17 @@ func (r *ZoneDNSSECResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
+	params := dns.DNSSECGetParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := ZoneDNSSECResultEnvelope{*data}
 	_, err := r.client.DNS.DNSSEC.Get(
 		ctx,
-		dns.DNSSECGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -194,11 +206,15 @@ func (r *ZoneDNSSECResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
+	params := dns.DNSSECDeleteParams{}
+
+	if !data.ID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	_, err := r.client.DNS.DNSSEC.Delete(
 		ctx,
-		dns.DNSSECDeleteParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

@@ -17,15 +17,17 @@ type StreamDownloadResultDataSourceEnvelope struct {
 }
 
 type StreamDownloadDataSourceModel struct {
-	AccountID  types.String                                                   `tfsdk:"account_id" path:"account_id,required"`
 	Identifier types.String                                                   `tfsdk:"identifier" path:"identifier,required"`
+	AccountID  types.String                                                   `tfsdk:"account_id" path:"account_id,optional"`
 	Audio      customfield.NestedObject[StreamDownloadAudioDataSourceModel]   `tfsdk:"audio" json:"audio,computed"`
 	Default    customfield.NestedObject[StreamDownloadDefaultDataSourceModel] `tfsdk:"default" json:"default,computed"`
 }
 
 func (m *StreamDownloadDataSourceModel) toReadParams(_ context.Context) (params stream.DownloadGetParams, diags diag.Diagnostics) {
-	params = stream.DownloadGetParams{
-		AccountID: cloudflare.F(m.AccountID.ValueString()),
+	params = stream.DownloadGetParams{}
+
+	if !m.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(m.AccountID.ValueString())
 	}
 
 	return

@@ -18,7 +18,7 @@ type ListResultDataSourceEnvelope struct {
 type ListDataSourceModel struct {
 	ID                    types.String  `tfsdk:"id" path:"list_id,computed"`
 	ListID                types.String  `tfsdk:"list_id" path:"list_id,required"`
-	AccountID             types.String  `tfsdk:"account_id" path:"account_id,required"`
+	AccountID             types.String  `tfsdk:"account_id" path:"account_id,optional"`
 	CreatedOn             types.String  `tfsdk:"created_on" json:"created_on,computed"`
 	Description           types.String  `tfsdk:"description" json:"description,computed"`
 	Kind                  types.String  `tfsdk:"kind" json:"kind,computed"`
@@ -29,8 +29,10 @@ type ListDataSourceModel struct {
 }
 
 func (m *ListDataSourceModel) toReadParams(_ context.Context) (params rules.ListGetParams, diags diag.Diagnostics) {
-	params = rules.ListGetParams{
-		AccountID: cloudflare.F(m.AccountID.ValueString()),
+	params = rules.ListGetParams{}
+
+	if !m.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(m.AccountID.ValueString())
 	}
 
 	return

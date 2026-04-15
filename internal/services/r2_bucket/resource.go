@@ -64,6 +64,12 @@ func (r *R2BucketResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	params := r2.BucketNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *R2BucketResource) Create(ctx context.Context, req resource.CreateReques
 	env := R2BucketResultEnvelope{*data}
 	_, err = r.client.R2.Buckets.New(
 		ctx,
-		r2.BucketNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -113,6 +117,12 @@ func (r *R2BucketResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
+	params := r2.BucketEditParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -123,9 +133,7 @@ func (r *R2BucketResource) Update(ctx context.Context, req resource.UpdateReques
 	_, err = r.client.R2.Buckets.Edit(
 		ctx,
 		data.Name.ValueString(),
-		r2.BucketEditParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -155,14 +163,18 @@ func (r *R2BucketResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
+	params := r2.BucketGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := R2BucketResultEnvelope{*data}
 	_, err := r.client.R2.Buckets.Get(
 		ctx,
 		data.Name.ValueString(),
-		r2.BucketGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -196,12 +208,16 @@ func (r *R2BucketResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
+	params := r2.BucketDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.R2.Buckets.Delete(
 		ctx,
 		data.Name.ValueString(),
-		r2.BucketDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

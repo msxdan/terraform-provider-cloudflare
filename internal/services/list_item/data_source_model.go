@@ -17,9 +17,9 @@ type ListItemResultDataSourceEnvelope struct {
 }
 
 type ListItemDataSourceModel struct {
-	AccountID  types.String                                              `tfsdk:"account_id" path:"account_id,required"`
 	ItemID     types.String                                              `tfsdk:"item_id" path:"item_id,required"`
 	ListID     types.String                                              `tfsdk:"list_id" path:"list_id,required"`
+	AccountID  types.String                                              `tfsdk:"account_id" path:"account_id,optional"`
 	ASN        types.Int64                                               `tfsdk:"asn" json:"asn,computed"`
 	Comment    types.String                                              `tfsdk:"comment" json:"comment,computed"`
 	CreatedOn  types.String                                              `tfsdk:"created_on" json:"created_on,computed"`
@@ -31,8 +31,10 @@ type ListItemDataSourceModel struct {
 }
 
 func (m *ListItemDataSourceModel) toReadParams(_ context.Context) (params rules.ListItemGetParams, diags diag.Diagnostics) {
-	params = rules.ListItemGetParams{
-		AccountID: cloudflare.F(m.AccountID.ValueString()),
+	params = rules.ListItemGetParams{}
+
+	if !m.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(m.AccountID.ValueString())
 	}
 
 	return

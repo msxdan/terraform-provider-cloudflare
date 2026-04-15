@@ -64,6 +64,12 @@ func (r *AccountMemberResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
+	params := accounts.MemberNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *AccountMemberResource) Create(ctx context.Context, req resource.CreateR
 	env := AccountMemberResultEnvelope{*data}
 	_, err = r.client.Accounts.Members.New(
 		ctx,
-		accounts.MemberNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -112,6 +116,12 @@ func (r *AccountMemberResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
+	params := accounts.MemberUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -122,9 +132,7 @@ func (r *AccountMemberResource) Update(ctx context.Context, req resource.UpdateR
 	_, err = r.client.Accounts.Members.Update(
 		ctx,
 		data.ID.ValueString(),
-		accounts.MemberUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -153,14 +161,18 @@ func (r *AccountMemberResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
+	params := accounts.MemberGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := AccountMemberResultEnvelope{*data}
 	_, err := r.client.Accounts.Members.Get(
 		ctx,
 		data.ID.ValueString(),
-		accounts.MemberGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -193,12 +205,16 @@ func (r *AccountMemberResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
+	params := accounts.MemberDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.Accounts.Members.Delete(
 		ctx,
 		data.ID.ValueString(),
-		accounts.MemberDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

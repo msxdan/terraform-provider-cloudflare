@@ -64,6 +64,12 @@ func (r *CertificatePackResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
+	params := ssl.CertificatePackNewParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *CertificatePackResource) Create(ctx context.Context, req resource.Creat
 	env := CertificatePackResultEnvelope{*data}
 	_, err = r.client.SSL.CertificatePacks.New(
 		ctx,
-		ssl.CertificatePackNewParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -108,14 +112,18 @@ func (r *CertificatePackResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 
+	params := ssl.CertificatePackGetParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := CertificatePackResultEnvelope{*data}
 	_, err := r.client.SSL.CertificatePacks.Get(
 		ctx,
 		data.ID.ValueString(),
-		ssl.CertificatePackGetParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -148,12 +156,16 @@ func (r *CertificatePackResource) Delete(ctx context.Context, req resource.Delet
 		return
 	}
 
+	params := ssl.CertificatePackDeleteParams{}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	_, err := r.client.SSL.CertificatePacks.Delete(
 		ctx,
 		data.ID.ValueString(),
-		ssl.CertificatePackDeleteParams{
-			ZoneID: cloudflare.F(data.ZoneID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

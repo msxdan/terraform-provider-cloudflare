@@ -64,6 +64,16 @@ func (r *LogpushJobResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
+	params := logpush.JobNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -71,14 +81,6 @@ func (r *LogpushJobResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 	res := new(http.Response)
 	env := LogpushJobResultEnvelope{*data}
-	params := logpush.JobNewParams{}
-
-	if !data.AccountID.IsNull() {
-		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
-		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
-	}
-
 	_, err = r.client.Logpush.Jobs.New(
 		ctx,
 		params,
@@ -118,6 +120,16 @@ func (r *LogpushJobResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
+	params := logpush.JobUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
+	if !data.ZoneID.IsNull() {
+		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -125,14 +137,6 @@ func (r *LogpushJobResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	res := new(http.Response)
 	env := LogpushJobResultEnvelope{*data}
-	params := logpush.JobUpdateParams{}
-
-	if !data.AccountID.IsNull() {
-		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
-		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
-	}
-
 	_, err = r.client.Logpush.Jobs.Update(
 		ctx,
 		data.ID.ValueInt64(),
@@ -165,16 +169,18 @@ func (r *LogpushJobResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	res := new(http.Response)
-	env := LogpushJobResultEnvelope{*data}
 	params := logpush.JobGetParams{}
 
 	if !data.AccountID.IsNull() {
 		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
+	}
+
+	if !data.ZoneID.IsNull() {
 		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
 	}
 
+	res := new(http.Response)
+	env := LogpushJobResultEnvelope{*data}
 	_, err := r.client.Logpush.Jobs.Get(
 		ctx,
 		data.ID.ValueInt64(),
@@ -215,7 +221,9 @@ func (r *LogpushJobResource) Delete(ctx context.Context, req resource.DeleteRequ
 
 	if !data.AccountID.IsNull() {
 		params.AccountID = cloudflare.F(data.AccountID.ValueString())
-	} else {
+	}
+
+	if !data.ZoneID.IsNull() {
 		params.ZoneID = cloudflare.F(data.ZoneID.ValueString())
 	}
 

@@ -13,8 +13,8 @@ type R2BucketLifecycleResultEnvelope struct {
 }
 
 type R2BucketLifecycleModel struct {
-	AccountID  types.String                    `tfsdk:"account_id" path:"account_id,required"`
 	BucketName types.String                    `tfsdk:"bucket_name" path:"bucket_name,required"`
+	AccountID  types.String                    `tfsdk:"account_id" path:"account_id,optional"`
 	Rules      *[]*R2BucketLifecycleRulesModel `tfsdk:"rules" json:"rules,optional"`
 }
 

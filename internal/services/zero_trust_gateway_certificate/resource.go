@@ -64,6 +64,12 @@ func (r *ZeroTrustGatewayCertificateResource) Create(ctx context.Context, req re
 		return
 	}
 
+	params := zero_trust.GatewayCertificateNewParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -73,9 +79,7 @@ func (r *ZeroTrustGatewayCertificateResource) Create(ctx context.Context, req re
 	env := ZeroTrustGatewayCertificateResultEnvelope{*data}
 	_, err = r.client.ZeroTrust.Gateway.Certificates.New(
 		ctx,
-		zero_trust.GatewayCertificateNewParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -108,14 +112,18 @@ func (r *ZeroTrustGatewayCertificateResource) Read(ctx context.Context, req reso
 		return
 	}
 
+	params := zero_trust.GatewayCertificateGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := ZeroTrustGatewayCertificateResultEnvelope{*data}
 	_, err := r.client.ZeroTrust.Gateway.Certificates.Get(
 		ctx,
 		data.ID.ValueString(),
-		zero_trust.GatewayCertificateGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -148,12 +156,16 @@ func (r *ZeroTrustGatewayCertificateResource) Delete(ctx context.Context, req re
 		return
 	}
 
+	params := zero_trust.GatewayCertificateDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.ZeroTrust.Gateway.Certificates.Delete(
 		ctx,
 		data.ID.ValueString(),
-		zero_trust.GatewayCertificateDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

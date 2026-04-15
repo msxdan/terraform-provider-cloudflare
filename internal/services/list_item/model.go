@@ -13,8 +13,8 @@ type ListItemResultEnvelope struct {
 }
 
 type ListItemModel struct {
-	AccountID   types.String                                    `tfsdk:"account_id" path:"account_id,required"`
 	ListID      types.String                                    `tfsdk:"list_id" path:"list_id,required"`
+	AccountID   types.String                                    `tfsdk:"account_id" path:"account_id,optional"`
 	ItemID      types.String                                    `tfsdk:"item_id" path:"item_id,optional"`
 	Body        *[]*ListItemBodyModel                           `tfsdk:"body" json:"body,required,no_refresh"`
 	ASN         types.Int64                                     `tfsdk:"asn" json:"asn,computed"`

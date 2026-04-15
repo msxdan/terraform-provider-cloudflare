@@ -61,6 +61,12 @@ func (r *R2BucketCORSResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
+	params := r2.BucketCORSUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -71,9 +77,7 @@ func (r *R2BucketCORSResource) Create(ctx context.Context, req resource.CreateRe
 	_, err = r.client.R2.Buckets.CORS.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketCORSUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -110,6 +114,12 @@ func (r *R2BucketCORSResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	params := r2.BucketCORSUpdateParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -120,9 +130,7 @@ func (r *R2BucketCORSResource) Update(ctx context.Context, req resource.UpdateRe
 	_, err = r.client.R2.Buckets.CORS.Update(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketCORSUpdateParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -151,14 +159,18 @@ func (r *R2BucketCORSResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
+	params := r2.BucketCORSGetParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	res := new(http.Response)
 	env := R2BucketCORSResultEnvelope{*data}
 	_, err := r.client.R2.Buckets.CORS.Get(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketCORSGetParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -191,12 +203,16 @@ func (r *R2BucketCORSResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
+	params := r2.BucketCORSDeleteParams{}
+
+	if !data.AccountID.IsNull() {
+		params.AccountID = cloudflare.F(data.AccountID.ValueString())
+	}
+
 	_, err := r.client.R2.Buckets.CORS.Delete(
 		ctx,
 		data.BucketName.ValueString(),
-		r2.BucketCORSDeleteParams{
-			AccountID: cloudflare.F(data.AccountID.ValueString()),
-		},
+		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

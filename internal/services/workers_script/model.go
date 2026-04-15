@@ -21,7 +21,7 @@ type WorkersScriptResultEnvelope struct {
 type WorkersScriptModel struct {
 	ID                 types.String                                                  `tfsdk:"id" json:"-,computed"`
 	ScriptName         types.String                                                  `tfsdk:"script_name" path:"script_name,required"`
-	AccountID          types.String                                                  `tfsdk:"account_id" path:"account_id,required"`
+	AccountID          types.String                                                  `tfsdk:"account_id" path:"account_id,optional"`
 	Metadata           *WorkersScriptMetadataModel                                   `tfsdk:"metadata" json:"metadata,required,no_refresh"`
 	Files              *[]types.String                                               `tfsdk:"files" json:"files,optional,no_refresh"`
 	CompatibilityDate  types.String                                                  `tfsdk:"compatibility_date" json:"compatibility_date,computed,no_refresh"`
