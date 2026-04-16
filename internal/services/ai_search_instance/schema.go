@@ -670,7 +670,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"engine_version": schema.Float64Attribute{
 				Computed: true,
-				Default:  float64default.StaticFloat64(2),
+				Default:  float64default.StaticFloat64(3),
 			},
 			"last_activity": schema.StringAttribute{
 				Computed:   true,
