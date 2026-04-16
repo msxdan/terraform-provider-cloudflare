@@ -1,5 +1,20 @@
 # Changelog
 
+## 5.19.0 (2026-04-16)
+
+Full Changelog: [v5.19.0-beta.5...v5.19.0](https://github.com/cloudflare/terraform-provider-cloudflare/compare/v5.19.0-beta.5...v5.19.0)
+
+### Bug Fixes
+
+* **account_member:** add UseStateForUnknown to status field to prevent drift ([841d6f9](https://github.com/cloudflare/terraform-provider-cloudflare/commit/841d6f9d5407b14378a2f72f6e0c9567d27bd4fb))
+* **tokens:** Change from set to list for token policies ([9937847](https://github.com/cloudflare/terraform-provider-cloudflare/commit/99378479e6942549ebcee9fa78ed5f6d19158def))
+
+
+### Chores
+
+* all migrations should use latest v4 provider ([3059f1a](https://github.com/cloudflare/terraform-provider-cloudflare/commit/3059f1ab3678b90585c8bea358818aea9ae89cd5))
+* **docs:** caveats and callouts ([31c0d88](https://github.com/cloudflare/terraform-provider-cloudflare/commit/31c0d8868ea9c68c66c98544634897d29e880a20))
+
 ## 5.19.0-beta.5 (2026-04-07)
 
 Full Changelog: [v5.19.0-beta.4...v5.19.0-beta.5](https://github.com/cloudflare/terraform-provider-cloudflare/compare/v5.19.0-beta.4...v5.19.0-beta.5)
